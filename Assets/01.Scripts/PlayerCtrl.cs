@@ -5,90 +5,65 @@ using UnityEngine.UI;
 
 public class PlayerCtrl : MonoBehaviour
 {
-    public static int m_playerMaxHp = 50;
-    [Range(0, 50)]
-    public float m_playerHp = 50;         //플레이어의 hp
-    public Slider m_playerHpbar = null;
-
-
+    public static int m_playerMaxHp = 50;  //플레이어의 최대 hp
+    public float m_playerHp = 50;         //플레이어의 현재 hp
+    public Slider m_playerHpbar = null;     //플레이어의 체력바
 
     #region//애니메이션용 변수
     public Anim anim;   //AnimSupporter.cs 쪽에 정의 / 인스펙터뷰에 표시할 애니메이션 클래스 변수
-    Animator m_RefAnimator = null;
-    string m_prevState = "";
-    AnimState m_CurState = AnimState.idle;
-    AnimatorStateInfo animatorStateInfo;
+    Animator m_RefAnimator = null;          //Animator 컴포넌트를 받을 변수
+    string m_prevState = "";                //현재 state의 이름
+    AnimState m_CurState = AnimState.idle;  //현재 state의 상태
     //애니메이션용 변수
     #endregion
 
     #region//공격시 방향 전환용 변수
     GameObject[] m_EnemyList = null;        //적의 위치를 알기위한 변수
-
     float m_AttackDist = 1.9f;              //공격 사거리
-    private GameObject m_TargetUnit = null;
-    bool m_AttRotPermit = false;
-
-    Vector3 a_CacTgVec = Vector3.zero;
-    Vector3 a_CacAtDir = Vector3.zero;      //방향 전환용 변수
+    Vector3 a_CacTgVec = Vector3.zero;      //타겟과의 거리 계산용 변수
     //공격시 방향 전환용 변수                                  
     #endregion
-
+    
     #region//데미지 계산용 변수
-    float a_fCacLen = 0.0f;
-    int iCount = 0;
-    //GameObject a_EffObj = null;
-    //Vector3 a_EffPos = Vector3.zero;
+    float a_fCacLen = 0.0f;         //적과의 거리 계산용 변수
+    int iCount = 0;                 //적이 얼마나 있는지
     //데미지 계산용 변수
     #endregion
 
     #region//키보드 입력값 변수
-    float h = 0, v = 0;
+    float h = 0, v = 0;             //각각Horizontal입력과 Vertical입력을 받는 변수
     Vector3 a_MoveNextStep;         //보폭계산을 위한 변수
-    Vector3 a_MoveHStep;
-    Vector3 a_MoveVStep;
+    Vector3 a_MoveVStep;            //Vertical움직임 계산 변수
     float m_MoveVelocity = 5.0f;       //평면 초당 이동속도
-    float a_CalcRotY = 0.0f;
+    float a_CalcRotY = 0.0f;           //y축 회전 계산용 변수
     float rotSpeed = 150.0f; //초당 150도 회전하라는 속도
-    float m_jumpPower = 4.5f;
+    protected float m_RotSpeed = 3.0f;          //초당 회전 속도
     //키보드 입력값 변수
     #endregion
 
-    #region//Picking 관련 변수 
-    private bool m_isPickMvOnOff = false;       //피킹 이동 OnOff
-    private Vector3 m_TargetPos = Vector3.zero; //최종 목표 위치
-    private Vector3 m_MoveDir = Vector3.zero;   //평면 진행 방향
-    private double m_MoveDurTime = 0.0;         //목표점까지 도착하는데 걸리는 시간
-    private double m_AddTimeCount = 0.0;        //누적시간 카운트 
-    protected float m_RotSpeed = 3.0f;          //초당 회전 속도
-    Vector3 a_StartPos = Vector3.zero;
-    Vector3 a_CacLenVec = Vector3.zero;
-    Quaternion a_TargetRot;
-    //Picking 관련 변수 
-    #endregion
-
     #region//joyStick 이동 변수
-    private float m_JoyMvLen = 0.0f;
-    private Vector3 m_JoyMvDir = Vector3.zero;
+    private float m_JoyMvLen = 0.0f;                //조이스틱 이동용 변수
+    private Vector3 m_JoyMvDir = Vector3.zero;      //조이스틱 방향체크변수
     //joyStick 이동 변수
     #endregion
 
     #region//플레이어의 등장 연출 변수
-    bool m_isBirth = false;
-    float m_dissolve;
-    Renderer[] renderers;
-    Material[] mats;
+    bool m_isBirth = false;             //리스폰시 한번만 셰이더가 동작하기 위한 변수
+    float m_dissolve;                   //dissolve값을 조절하기 위한 변수
+    Renderer[] renderers;               //Renderer 컴포넌트를 가져오기위한 변수
+    Material[] mats;                    //플레이어의 material을 가져오기 위한 변수
     #endregion
 
     #region//오브젝트와의 상호 작용 관련 변수
-    GameManager m_gameMgr;
-    DoorCtrl m_doorCtrl;
-    [SerializeField] Transform m_rayPos;
-    LayerMask m_doorlayer;
-    LayerMask m_Keyslayer;
-    LayerMask m_Potionlayer;
-    RaycastHit hit;
-    public GameObject m_userText;
-    public GameObject[] m_Keys;
+    GameManager m_gameMgr;                  //GameManager의 변수를 가져오기 위한 변수
+    DoorCtrl m_doorCtrl;                    //DoorCtrl의 변수를 가져오기 위한 변수
+    [SerializeField] Transform m_rayPos;    //ray의 시작점
+    LayerMask m_doorlayer;                  //door의 레이어
+    LayerMask m_Keyslayer;                  //Key의 레이어
+    LayerMask m_Potionlayer;                //Potion의 레이어
+    RaycastHit hit;                         //ray에 닿았는지의 정보
+    public GameObject m_userText;           //유저에게 보여지는 텍스트 변수
+    public GameObject[] m_Keys;             //유저가 획득한 열쇠를 보기위한 변수
     #endregion
 
 
@@ -103,11 +78,13 @@ public class PlayerCtrl : MonoBehaviour
         GameObject[] door = GameObject.FindGameObjectsWithTag("Door");
 
         for (int i = 0; i < door.Length; i++)
+        {
             if (door[i] != null)
             {
                 m_doorCtrl = door[i].GetComponent<DoorCtrl>();
             }
-
+        }
+           
         GameObject gm = GameObject.Find("GameManager");
         if (gm != null)
         {
@@ -137,7 +114,7 @@ public class PlayerCtrl : MonoBehaviour
             ChangeText();
             m_userText.SetActive(true);
         }
-        else if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Potionlayer))
+        else if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Potionlayer))  //Potion 레이어에 레이가 맞았다면
         {          
             ChangeText();
             m_userText.SetActive(true);
@@ -147,7 +124,8 @@ public class PlayerCtrl : MonoBehaviour
             m_userText.SetActive(false);
         }
 
-        if (m_playerHp <= 0)        //플레이어의 체력이 0보다 작다면
+        //플레이어의 체력이 0보다 작다면
+        if (m_playerHp <= 0)        
         {
             MySetAnim(AnimState.die);
 
@@ -158,9 +136,9 @@ public class PlayerCtrl : MonoBehaviour
 
         m_playerHpbar.value = (float)m_playerHp / (float)m_playerMaxHp;
 
-        KeyBoardMove();     //키보드 조작 함수
+        KeyBoardMove();         //키보드 조작 함수
         JoyStickMoveUpdate();   //조이스틱 조작 함수
-        NaturalRecovery();
+        NaturalRecovery();      //체력 회복 함수
     }
 
     void ResponStart()//게임 시작후 플레이어를 리스폰 시키는 함수
@@ -181,7 +159,8 @@ public class PlayerCtrl : MonoBehaviour
         //시작할때 플레이어를 리스폰시키는 연출
     }
 
-    IEnumerator Birth()//플레이어의 셰이더값을 조절해 서서히 나타나게 하는 함수
+    //플레이어의 셰이더값을 조절해 서서히 나타나게 하는 함수
+    IEnumerator Birth()
     {
         while (m_dissolve > 0f)
         {
@@ -201,13 +180,15 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
+    //키보드로 이동
     void KeyBoardMove()
     {
+        //상호작용
         if (Input.GetKeyDown(KeyCode.F))
         {
-            DoorOnOff();
-            TakeKeys();
-            Potion();
+            DoorOnOff();        //문열고닫기
+            TakeKeys();         //열쇠챙기기
+            Potion();           //포션먹기
         }
 
         //가감속 없이 이동하는 법
@@ -222,7 +203,6 @@ public class PlayerCtrl : MonoBehaviour
         {
             if (ISAttack() == true)
                 return;
-
 
             //기본적인 이동
             a_CalcRotY = transform.eulerAngles.y;
@@ -241,18 +221,17 @@ public class PlayerCtrl : MonoBehaviour
         else
         {
             //키보드 이동중이 아닐 때만 Idle 동작으로 돌아가게 한다.
-            if (m_isPickMvOnOff == false && m_JoyMvLen <= 0.0f && ISAttack() == false)
+            if (m_JoyMvLen <= 0.0f && ISAttack() == false)
             {
                 MySetAnim(AnimState.idle);
             }
-
         }
-
     }
 
     //조이스틱 관련 변수
     Vector3 a_CacCamVec;    //카메라의 위치
-    Vector3 a_RightDir = Vector3.zero;
+    Vector3 a_RightDir = Vector3.zero;  //오른쪽방향
+    //조이스틱의 움직임과 동기화
     public void SetJoyStickMove(float a_JoyMoveLen, Vector3 a_JoyMoveDir)
     {
         m_JoyMvLen = a_JoyMoveLen;
@@ -265,7 +244,7 @@ public class PlayerCtrl : MonoBehaviour
             a_CacCamVec.Normalize();
             m_JoyMvDir = a_CacCamVec * a_JoyMoveDir.y; //위 아래 조작(카메라가 바라보고 있는 기준으로 위, 아래로 얼만큼 이동시킬 것인지?)
             a_RightDir = Vector3.Cross(Vector3.up, a_CacCamVec).normalized;
-            m_JoyMvDir = m_JoyMvDir + (a_RightDir * a_JoyMoveDir.x); //좌우 조작(카메라가 바라보고 있는 기준으로 좌, 우로 얼만큼 이동시킬 것인지?)
+            m_JoyMvDir += (a_RightDir * a_JoyMoveDir.x); //좌우 조작(카메라가 바라보고 있는 기준으로 좌, 우로 얼만큼 이동시킬 것인지?)
             m_JoyMvDir.y = 0.0f;
             m_JoyMvDir.Normalize();
             //--------카메라가 바라보고 있는 전면을 기준으로 회전 시켜줘야 한다. 
@@ -274,11 +253,12 @@ public class PlayerCtrl : MonoBehaviour
         if (a_JoyMoveLen == 0.0f)
         {
             //공격 애니메이션 중이면 공격 애니메이션이 끝나고 숨쉬기 애니로 돌아가게 한다.
-            if (m_isPickMvOnOff == false && ISAttack() == false)
+            if (ISAttack() == false)
                 MySetAnim(AnimState.idle);
         }
     }
 
+    //조이스틱 이동
     void JoyStickMoveUpdate()
     {
         if (h != 0.0f || 0.0f != v)
@@ -289,9 +269,6 @@ public class PlayerCtrl : MonoBehaviour
         {
             if (ISAttack() == true)
                 return;
-
-            m_MoveDir = m_JoyMvDir;
-            float amtToMove = m_MoveVelocity * Time.deltaTime;
 
             //캐릭터 스프링 회전
             if (0.0001f < m_JoyMvDir.magnitude)
@@ -308,11 +285,10 @@ public class PlayerCtrl : MonoBehaviour
             transform.position = transform.position + a_MoveNextStep;
 
             MySetAnim(AnimState.move);
-
         }
-
     }
 
+    //공격을 하는 중이라면
     public bool ISAttack()
     {
         if (m_prevState != null && !string.IsNullOrEmpty(m_prevState))
@@ -320,10 +296,10 @@ public class PlayerCtrl : MonoBehaviour
             if (m_prevState.ToString() == AnimState.attack.ToString())
                 return true;
         }
-
         return false;
     }
 
+    //애니메이션 관리 함수
     public void MySetAnim(AnimState newAnim, float CrossTime = 1.0f, string AnimName = "") //PlayMode mode = PlayMode.StopSameLayer)
     {
         if (m_RefAnimator == null)
@@ -341,8 +317,6 @@ public class PlayerCtrl : MonoBehaviour
             m_prevState = null;
         }
 
-        m_AttRotPermit = false; //모든 애니메이션이 시작할 때 먼저 꺼준다
-
         if (0.0f < CrossTime)
         {
             m_RefAnimator.SetTrigger(newAnim.ToString());
@@ -356,6 +330,7 @@ public class PlayerCtrl : MonoBehaviour
         m_CurState = newAnim;
     }//MySetAnim
 
+    //공격하는 함수
     public void AttackOrder()
     {
         if (m_prevState == AnimState.idle.ToString()
@@ -368,6 +343,7 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
+    //문 열고 닫는 함수
     public void DoorOnOff()
     {
         Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 3.0f;
@@ -380,6 +356,7 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
+    //열쇠 챙기는 함수
     public void TakeKeys()
     {
         Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 3.0f;
@@ -392,28 +369,29 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
+    //포션 먹는 함수
     public void Potion()
     {
         Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 3.0f;
         if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Potionlayer))
         {
-
             if (hit.collider.CompareTag("Potion_Health"))
             {
                 if (m_Keys[2] == null)
                 {
                     hit.collider.transform.GetComponent<PotionCtrl>().TakePotion();
-                }
+                }//if (m_Keys[2] == null)
+            }//if (hit.collider.CompareTag("Potion_Health"))
+        }//if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Potionlayer))
+    }//public void Potion()
 
-            }
-        }
-    }
-
+    //공격의 끝을 확인하는 이벤트함수
     public void IsAttackFinish()
     {
         MySetAnim(AnimState.idle);
     }
 
+    //애니메이션 이벤트 호출용 함수
     public void Event_AttDamage(string Type)
     {
         m_EnemyList = GameObject.FindGameObjectsWithTag("Enemy");
@@ -439,6 +417,7 @@ public class PlayerCtrl : MonoBehaviour
         }//if(Type == AnimState.attack.ToString())       
     }
 
+    //피격당했다면
     public void TakeDamage(float a_Damage = 10.0f)
     {
         if (m_playerHp <= 0.0f)
@@ -452,6 +431,7 @@ public class PlayerCtrl : MonoBehaviour
             m_playerHp = 0;
     }
 
+    //클리어 체크를 위한 트리거 함수
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("GameClear!!!");
@@ -460,6 +440,7 @@ public class PlayerCtrl : MonoBehaviour
         m_gameMgr.m_isClearbgm = true;
     }
 
+    //어떤 플랫폼인지에 따라 문에 뜨는 텍스트 변경하는 함수
     void ObjectText()
     {
         if (hit.collider.transform.GetComponent<DoorCtrl>().IsOpen == true)
@@ -545,34 +526,38 @@ public class PlayerCtrl : MonoBehaviour
                 && !hit.collider.transform.GetComponent<DoorCtrl>().m_needSilverKey && m_Keys[1] != null)
             {
                 ObjectText();
-
             }
             //열쇠가 필요하지 않을 때
             else
             {
                 ObjectText();
             }
-
         }
 
+        //열쇠가 체크된다면
         if (hit.collider.CompareTag("Keys"))
         {
             if (hit.collider.transform.GetComponent<KeysCtrl>().m_isNomalKey)
             {
+                //일반열쇠라면
                 m_userText.GetComponentInChildren<Text>().text = "일반 열쇠를 획득합니다.";
             }
             else if (hit.collider.transform.GetComponent<KeysCtrl>().m_isSilverKey)
             {
+                //실버열쇠라면
                 m_userText.GetComponentInChildren<Text>().text = "은 열쇠를 획득합니다.";
             }
             else if (hit.collider.transform.GetComponent<KeysCtrl>().m_isGoldenKey)
             {
+                //골드열쇠라면
                 m_userText.GetComponentInChildren<Text>().text = "금 열쇠를 획득합니다.";
             }
         }
 
+        //포션이 체크된다면
         if (hit.collider.CompareTag("Potion_Health"))
         {
+            //포션이라면
             m_userText.GetComponentInChildren<Text>().text = "포션을 섭취합니다";
         }
     }
@@ -583,9 +568,8 @@ public class PlayerCtrl : MonoBehaviour
         m_gameMgr.PlayerRecovery();
         if (!m_gameMgr.m_isRecovery)
         {
+            //체력의 소수점을 반올림하여 정수로 만든다
             m_playerHp = Mathf.Round(m_playerHp);
         }
     }
-
-
 }

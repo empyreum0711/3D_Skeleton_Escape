@@ -101,7 +101,7 @@ public class A_Singleton<T> : MonoBehaviour where T : A_Singleton<T> //Scene이 
 
                     if (m_Instance == null)
                     {
-                        //이쪽이 첫번째로 들어오고...
+                        //여기가 첫번째로 들어온다
                         string goName = typeof(T).ToString();
                         GameObject a_go = GameObject.Find(goName);
                         if (a_go == null)

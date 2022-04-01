@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public bool m_StartFade = false;   //점멸 조건
     private float m_CacTime = 0.0f;     //시간 계산용 변수
     private float m_AddTimer = 0.0f;    //현재 시간에 더해주는 시간
-    private Color m_Color;
+    private Color m_Color;              //컬러값 변수
     private readonly float m_StartValue = 1.0f;  //시작 알파값
     private readonly float m_EndValue = 0.0f;    //끝나는 알파값
     //체력이 30퍼센트 이하일때 붉은색 화면이 점멸하는 부분
@@ -78,13 +78,12 @@ public class GameManager : MonoBehaviour
     void Start()
     {
 #if UNITY_ANDROID
-        if (mobileUIObj != null)
-            mobileUIObj.SetActive(true);
+        
 #else
 
 #endif
-
-
+        if (mobileUIObj != null)
+            mobileUIObj.SetActive(true);
         SoundManager.Instance.PlayBGM("InGame_BGM",0.1f);
 
         GameObject a_Player = GameObject.Find("SKELETON");
@@ -101,9 +100,6 @@ public class GameManager : MonoBehaviour
             m_SoundMgr = a_SdMgr.GetComponentInChildren<AudioSource>();
         }
            
-       
-
-
         GameObject[] a_Enemy = GameObject.FindGameObjectsWithTag("Enemy");
         for (int i = 0; i < m_refEnemy.Length; i++)
         {
@@ -112,8 +108,6 @@ public class GameManager : MonoBehaviour
                 m_refEnemy[i] = a_Enemy[i].GetComponent<EnemyCtrl>();
             }
         }
-
-
 
         //Fixed JoyStick 처리부분
         #region
@@ -242,17 +236,13 @@ public class GameManager : MonoBehaviour
             {
                 SceneManager.LoadScene("01.TitleScene");
             });
-        //게임 오버시 나오는 버튼들
 
-        //게임 클리어시 나오는 버튼들
         if (m_CExitBtn != null)
             m_CExitBtn.onClick.AddListener(() =>
             {
                 SceneManager.LoadScene("01.TitleScene");
             });
-        //게임 클리어시 나오는 버튼들
-
-      
+        //게임 오버시 나오는 버튼들
     }
 
     // Update is called once per frame
@@ -263,7 +253,7 @@ public class GameManager : MonoBehaviour
         //좌클릭을 했을때
         if (Input.GetMouseButtonDown(0))
         {
-            if (MouseHover.instance.isUIHover == false)
+            if (MouseHover.MHinstance.isUIHover == false)
             {
                 m_refHero.AttackOrder();
             }

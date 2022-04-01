@@ -16,8 +16,6 @@ public class EnemyCtrl : MonoBehaviour
     
     //Enemy AI
     public GameObject m_AggroTarget = null;
-    int m_AggroTargetID = -1;               //이 Enemy가 공격해야할 캐릭터의 고유 번호
-    int m_CurAggroTargetID = -1;     //이 Enemy가 공격해야할 캐릭터의 고유 번호 중계용 변수
     Vector3 m_MoveDir = Vector3.zero;       //수평 진행 노멀 방향 벡터
     public Vector3 m_CacVLen = Vector3.zero;       //플레이어를 향하는 벡터
     public float a_CacDist = 0.0f;                 //거리 계산용 변수
@@ -25,14 +23,12 @@ public class EnemyCtrl : MonoBehaviour
     float attackDist = 1.8f;                //공격 거리
     Quaternion a_TargetRot;                 //회전 계산용 변수
     float m_RotSpeed = 7.0f;                //초당 회전 속도
-    float m_NowStep = 0.0f;                 //이동 계산용 변수
-    Vector3 a_MoveNextStep = Vector3.zero;  //이동 계산용 변수
     GameObject m_Attacker = null;           //이 Enemy를 공격한 캐릭터
     float m_durDieTime;                     //죽고나서 이 시간만큼 지나면 오브젝트 파괴
 
     [SerializeField] Transform m_rayPos;    //BoxCast의 시작점
     LayerMask m_playerlayer;                //BoxCast에 맞은게 플레이어인지 확인하기 위한 레이어
-    RaycastHit hit;
+    RaycastHit hit;                         
     Vector3 m_scales;                       //BoxCast의 크기
     float m_ScaleX = 7.0f;                  //BoxCast의 x축의 길이
     float m_ScaleY = 3.0f;                  //BoxCast의 y축의 길이

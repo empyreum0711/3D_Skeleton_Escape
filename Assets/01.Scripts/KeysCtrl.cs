@@ -6,21 +6,14 @@ using UnityEngine.UI;
 public class KeysCtrl : MonoBehaviour
 {
 
-    public bool m_isNomalKey = false;
-    public bool m_isSilverKey = false;
-    public bool m_isGoldenKey = false;
-
-    //[HideInInspector] public PlayerCtrl m_refHero = null;
+    public bool m_isNomalKey = false;       //일반 열쇠를 획득하면 true
+    public bool m_isSilverKey = false;      //실버 열쇠를 획득하면 true
+    public bool m_isGoldenKey = false;      //골드 열쇠를 획득하면 true
 
     // Start is called before the first frame update
     void Start()
     {
-        //GameObject a_Player = GameObject.Find("SKELETON");
 
-        //if (a_Player != null)
-        //{
-        //    m_refHero = a_Player.GetComponent<PlayerCtrl>();
-        //}
     }
 
     // Update is called once per frame
@@ -29,9 +22,9 @@ public class KeysCtrl : MonoBehaviour
 
     }
 
+    //키오브젝트를 삭제
     public void KeysOnOff()
-    {
-        
+    {       
         Destroy(this.gameObject);
     }
 }

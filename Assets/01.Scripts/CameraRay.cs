@@ -16,7 +16,8 @@ public class CameraRay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-#if UINTY_ANDROID
+        //안드로이드일때
+#if UNITY_ANDROID
         if (Input.GetMouseButton(0))
         {
             m_rotX = -Input.GetAxis("Mouse Y") * m_rotSpeed;    //마우스 정보 받기
@@ -25,6 +26,7 @@ public class CameraRay : MonoBehaviour
 #endif
         if (Input.GetMouseButton(1))
         {
+            //우클릭으로 화면회전
             m_rotX = -Input.GetAxis("Mouse Y") * m_rotSpeed;    //마우스 정보 받기
             this.transform.eulerAngles += new Vector3(m_rotX, 0.0f, 0.0f);
         }
