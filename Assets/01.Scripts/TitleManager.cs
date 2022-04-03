@@ -5,38 +5,40 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 public class TitleManager : MonoBehaviour
 {
-    public Text m_TitleTxt = null;
-    public GameObject BtnGroup = null;
-    public GameObject m_ExPlainPanel = null;
-    public GameObject m_TitlePanel = null;
+    public Text m_TitleTxt = null;                  //타이틀
+    public GameObject BtnGroup = null;              //스타트 버튼과 설명 버튼
+    public GameObject m_ExPlainPanel = null;        //설명 판넬
+    public GameObject m_TitlePanel = null;          //타이틀 판넬
 
-    public Button m_StartBtn = null;
-    public Button m_ExplainBtn = null;
-    public Button m_ExplainCloseBtn = null;
+    public Button m_StartBtn = null;                //스타트 버튼
+    public Button m_ExplainBtn = null;              //설명 버튼
+    public Button m_ExplainCloseBtn = null;         //설명 닫기 버튼
 
     // Start is called before the first frame update
     void Start()
     {
         SoundManager.Instance.PlayBGM("Title_BGM", 0.1f);
 
+        //스타트 버튼
         if (m_StartBtn != null)
             m_StartBtn.onClick.AddListener(() =>
             {
                 StartBtn();
             });
 
+        //설명 버튼
         if (m_ExplainBtn != null)
             m_ExplainBtn.onClick.AddListener(() =>
             {
                 Explain();
             });
 
+        //설명 나가기 버튼
         if (m_ExplainCloseBtn != null)
             m_ExplainCloseBtn.onClick.AddListener(() =>
             {
                 ExplainClose();
             });
-
     }
 
     // Update is called once per frame
@@ -54,6 +56,7 @@ public class TitleManager : MonoBehaviour
         }
     }
 
+    //게임씬으로 이동
     void StartBtn()
     {
         SceneManager.LoadScene("02.InGame");//인게임 씬으로 이동

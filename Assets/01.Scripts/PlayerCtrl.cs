@@ -91,7 +91,6 @@ public class PlayerCtrl : MonoBehaviour
             m_gameMgr = gm.GetComponent<GameManager>();
         }
 
-
         ResponStart();//플레이어를 서서히 리스폰 시키는 함수
     }
 
@@ -351,7 +350,7 @@ public class PlayerCtrl : MonoBehaviour
         {
             if (hit.collider.CompareTag("Door"))
             {
-                hit.collider.transform.GetComponent<DoorCtrl>().DoorOpenMin90();
+                hit.collider.transform.GetComponent<DoorCtrl>().CheckKeys();
             }
         }
     }

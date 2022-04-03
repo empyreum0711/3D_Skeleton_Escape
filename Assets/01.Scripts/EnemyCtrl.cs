@@ -12,19 +12,20 @@ public class EnemyCtrl : MonoBehaviour
     //Enemy의 현재 상태 정보를 저장할 enum 변수
     public AnimState m_EnemyState = AnimState.idle;
 
+    //애니메이션 할당용 변수
     Animation m_RefAnimation = null;
     
     //Enemy AI
-    public GameObject m_AggroTarget = null;
-    Vector3 m_MoveDir = Vector3.zero;       //수평 진행 노멀 방향 벡터
-    public Vector3 m_CacVLen = Vector3.zero;       //플레이어를 향하는 벡터
-    public float a_CacDist = 0.0f;                 //거리 계산용 변수
-    public float traceDist = 7.0f;                 //추적 거리
-    float attackDist = 1.8f;                //공격 거리
-    Quaternion a_TargetRot;                 //회전 계산용 변수
-    float m_RotSpeed = 7.0f;                //초당 회전 속도
-    GameObject m_Attacker = null;           //이 Enemy를 공격한 캐릭터
-    float m_durDieTime;                     //죽고나서 이 시간만큼 지나면 오브젝트 파괴
+    public GameObject m_AggroTarget = null;         //플레이어(타겟)오브젝트
+    Vector3 m_MoveDir = Vector3.zero;               //수평 진행 노멀 방향 벡터
+    public Vector3 m_CacVLen = Vector3.zero;        //플레이어를 향하는 벡터
+    public float a_CacDist = 0.0f;                  //거리 계산용 변수
+    public float traceDist = 7.0f;                  //추적 거리
+    float attackDist = 1.8f;                        //공격 거리
+    Quaternion a_TargetRot;                         //회전 계산용 변수
+    float m_RotSpeed = 7.0f;                        //초당 회전 속도
+    GameObject m_Attacker = null;                   //이 Enemy를 공격한 캐릭터
+    float m_durDieTime;                             //죽고나서 이 시간만큼 지나면 오브젝트 파괴
 
     [SerializeField] Transform m_rayPos;    //BoxCast의 시작점
     LayerMask m_playerlayer;                //BoxCast에 맞은게 플레이어인지 확인하기 위한 레이어
@@ -39,18 +40,18 @@ public class EnemyCtrl : MonoBehaviour
     bool m_isDamaged = false;        //플레이어에게 공격 당했는지
     //Enemy AI
 
-    protected NavMeshAgent nvAgent;
-    protected NavMeshPath movePath;
+    protected NavMeshAgent nvAgent;         //네브메쉬에이전트 할당용 변수
+    protected NavMeshPath movePath;         //네브메쉬패스 할당용 변수
 
-    protected Vector3 m_PathEndPos = Vector3.zero;
-    [HideInInspector] public int m_CurPathIndex = 1;
+    protected Vector3 m_PathEndPos = Vector3.zero;      //네브메쉬 이동 도착지점
+    [HideInInspector] public int m_CurPathIndex = 1;    //현재 movePath의 인덱스
     protected double m_MoveDurTime = 0.0f;      //목표점까지 도착하는데 걸리는 시간
     protected double m_AddTimeCount = 0.0f;     //누적시간 카운트
-    float m_MoveTick = 0.0f;
+    float m_MoveTick = 0.0f;                    //한번 움직이는데 걸리는 시간
 
     //-------------공격 애니 관련 변수
-    float a_CacRate = 0.0f;
-    float a_NormalTime = 0.0f;
+    float a_CacRate = 0.0f;                 //공격 애니메이션의 진행도 계산용 변수
+    float a_NormalTime = 0.0f;              //애니메이션의 현재 진행도
     //-------------공격 애니 관련 변수
 
     //MyNavCalcPath 함수관련 변수
@@ -58,30 +59,30 @@ public class EnemyCtrl : MonoBehaviour
     //MyNavCalcPath 함수관련 변수
 
     //---ㅡMoveToPath 관련 변수들...
-    private bool a_isSucessed = true;
-    private Vector3 a_CurCPos = Vector3.zero;
-    private Vector3 a_CacDestV = Vector3.zero;
-    private Vector3 a_TargetDir;
-    private float a_CacSpeed = 0.0f;
-    private float a_NowStep = 0.0f;
-    private Vector3 a_Velocity = Vector3.zero;
-    private Vector3 a_vTowardNom = Vector3.zero;
-    private int a_OldPathCount = 0;
+    private bool a_isSucessed = true;               //목적지에 도착하였는지
+    private Vector3 a_CurCPos = Vector3.zero;       //현재 위치
+    private Vector3 a_CacDestV = Vector3.zero;      //movePath의 경로
+    private Vector3 a_TargetDir;                    //타겟의 방향
+    private float a_CacSpeed = 0.0f;                //속도계산용 변수
+    private float a_NowStep = 0.0f;                 //한 걸음의 보폭
+    private Vector3 a_Velocity = Vector3.zero;      //이동 속도
+    private Vector3 a_vTowardNom = Vector3.zero;    //이동할 movePath.corners의 방향으로 회전
+    private int a_OldPathCount = 0;                 //이전 movePath
     ////---ㅡMoveToPath 관련 변수들...
 
     //Event_Attack 함수관련
-    Vector3 a_DistVec = Vector3.zero;
-    float a_CacLen = 0.0f;
+    Vector3 a_DistVec = Vector3.zero;                   //공격 할 수 있는 각도
+    float a_CacLen = 0.0f;                              //공격 최대 사거리
     //Event_Attack 함수관련
 
-    public GameObject m_EnemyUI = null;
-    public float m_MaxEHp = 50.0f;
-    public float m_CurEHp = 50.0f;
-    public Image m_imgHpbar = null;
+    public GameObject m_EnemyUI = null;     //적의 UI오브젝트
+    public float m_MaxEHp = 50.0f;          //최대체력
+    public float m_CurEHp = 50.0f;          //현재 체력
+    public Image m_imgHpbar = null;         //HP바 이미지
 
-    float m_endbattleTime = 0.0f;
-    public bool m_isbattle;
-    GameManager m_gmMgr = null;
+    float m_endbattleTime = 0.0f;           //전투가 끝나고 전투가 풀릴때까지 걸리는 시간
+    public bool m_isbattle;                 //전투중인지
+    GameManager m_gmMgr = null;             //게임 매니저 스크립트 할당용 변수
 
     // Start is called before the first frame update
     void Start()
@@ -96,8 +97,6 @@ public class EnemyCtrl : MonoBehaviour
         GameObject gm = GameObject.Find("GameManager");
         if (m_gmMgr != null)
             m_gmMgr.GetComponent<GameManager>();
-
-
     }
 
     // Update is called once per frame
@@ -128,8 +127,6 @@ public class EnemyCtrl : MonoBehaviour
         if (m_MoveTick < 0.0f)
             m_MoveTick = 0.0f;
 
-        
-
         EnemyStateUpdate();         
         EnemyActionUpdate();        
     }
@@ -149,13 +146,12 @@ public class EnemyCtrl : MonoBehaviour
         if (Vector3.Dot(transform.forward, a_DistVec.normalized) < 0.0f)//90도를 넘는 범위 안에 있을경우
             return;
 
-        //공격각도 안에 있는 경우
+        //공격범위 밖에 있는 경우
         if ((attackDist + 1.7f) < a_CacLen)
             return;
 
         if (m_RefAnimation != null)
             m_AggroTarget.GetComponent<PlayerCtrl>().TakeDamage(10.0f);
-
     }
 
     //Damage를 받는 함수
@@ -338,7 +334,7 @@ public class EnemyCtrl : MonoBehaviour
                     / m_RefAnimation[anim.Attack1.name].length;
 
                 //m_RefAnimation["Attack1h1"].time   //애니메이션이 얼마나 진행되었는지의 현재 시간값
-                //m_RefAnimation["Attack1h1"].length //한동작이 끝날 때까지의 시간값
+                //m_RefAnimation["Attack1h1"].length //한동작이 끝날 때까지의 시간값(애니메이션의 총길이)
 
                 //소수점 한동작이 몇프로 진행되었는지 계산 변수
                 a_CacRate = a_NormalTime - (float)((int)a_NormalTime);
@@ -350,7 +346,8 @@ public class EnemyCtrl : MonoBehaviour
         return false;
     }
 
-    public bool MyNavCalcPath(Vector3 a_StartPos, Vector3 a_TargetPos, ref float a_PathLen) //길찾기
+    //네비게이션길찾기계산 함수
+    public bool MyNavCalcPath(Vector3 a_StartPos, Vector3 a_TargetPos, ref float a_PathLen)
     {
         // 이동이 시작된 상황이므로 초기화 하고 계산 시작
         movePath.ClearCorners();    //경로 모두 제거
@@ -419,6 +416,7 @@ public class EnemyCtrl : MonoBehaviour
         }//if(m_RefAnimation != null)
     }//public void MySetAnim
 
+    //네비게인션을 이용해 실제 이동하는 함수
     public bool MoveToPath(float overSpeed = 1.0f)
     {
         a_isSucessed = true;
@@ -484,10 +482,10 @@ public class EnemyCtrl : MonoBehaviour
             }
             a_isSucessed = false;   //아직 목적지에 도착하지 않았다면 재실행 할 것
         }
-
         return a_isSucessed;
     }//public bool MoveToPath(float overSpeed = 1.0f)
 
+    //도착 후 경로 삭제하는 함수
     void ClearPath()
     {
         m_PathEndPos = transform.position;

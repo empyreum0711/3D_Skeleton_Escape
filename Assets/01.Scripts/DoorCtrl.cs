@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 public class DoorCtrl : MonoBehaviour
 {
-    [HideInInspector] public bool IsOpen;
-    [HideInInspector] public bool m_needGoldenKey = false;
-    [HideInInspector] public bool m_needSilverKey = false;
-    [HideInInspector] public bool m_needNormalKey = false;
+    [HideInInspector] public bool IsOpen;                   //문이 열렸는지
+    [HideInInspector] public bool m_needGoldenKey = false;  //골드열쇠로 열 수 있다
+    [HideInInspector] public bool m_needSilverKey = false;  //실버열쇠로 열 수 있다
+    [HideInInspector] public bool m_needNormalKey = false;  //일반열쇠로 열 수 있다
 
-    [HideInInspector] public PlayerCtrl m_refHero = null;
+    [HideInInspector] public PlayerCtrl m_refHero = null;   //플레이어스크립트를 사용하기 위한 변수
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +29,8 @@ public class DoorCtrl : MonoBehaviour
 
     }
 
-    public void DoorOpenMin90()
+    //문을 열 때 열쇠가 필요한지? 필요하다면 어떤 열쇠가 필요한지 체크하는 함수
+    public void CheckKeys()
     {
         if (m_needNormalKey && m_needSilverKey && m_needGoldenKey)    //모든 열쇠가 필요할때
         {
@@ -65,6 +66,7 @@ public class DoorCtrl : MonoBehaviour
         }
     }
 
+    //문을 열고 닫는 함수
     void DoorOpenClose()
     {
         if (IsOpen == true)//문을 닫는다

@@ -20,6 +20,7 @@ public class CameraRay : MonoBehaviour
 #if UNITY_ANDROID
         if (Input.GetMouseButton(0))
         {
+            //좌클릭으로 화면회전
             m_rotX = -Input.GetAxis("Mouse Y") * m_rotSpeed;    //마우스 정보 받기
             this.transform.eulerAngles += new Vector3(m_rotX, 0.0f, 0.0f);
         }

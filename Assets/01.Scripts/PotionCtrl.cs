@@ -17,6 +17,7 @@ public class PotionCtrl : MonoBehaviour
         
     }
 
+    //포션을 챙김
     public void TakePotion()
     {
         PlayerCtrl.m_playerMaxHp = 100 + PlayerCtrl.m_playerMaxHp; 

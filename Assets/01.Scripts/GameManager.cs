@@ -6,9 +6,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 enum JoyStickType
 {
-    Fixed = 0,
-    Flexible = 1,
-    FlexibleOnOff = 2
+    Fixed = 0,              //m_JoySBackObj.activeSelf == true && m_JoystickPickPanel.activeSelf == false
+    Flexible = 1,           //m_JoySBackObj.activeSelf == true && m_JoystickPickPanel.activeSelf == true
+    FlexibleOnOff = 2       //m_JoySBackObj.activeSelf == false && m_JoystickPickPanel.activeSelf == true
 }
 
 public class GameManager : MonoBehaviour
@@ -22,22 +22,23 @@ public class GameManager : MonoBehaviour
     //Fixed JoyStick 처리부분
     JoyStickType m_JoyStickType = JoyStickType.Fixed;
     [Header("조이스틱 관련변수")]
-    public GameObject m_JoyStickBackObj = null;
-    public Image m_JoyStickImg = null;
-    float m_Radius = 0.0f;
-    Vector3 m_OrignPos = Vector3.zero;
-    Vector3 m_Axis = Vector3.zero;
-    Vector3 m_JsCacVec = Vector3.zero;
-    float m_JsCacDist = 0.0f;
+    public GameObject m_JoyStickBackObj = null;             //조이스틱을 사용할 수 있는 백그라운드
+    public Image m_JoyStickImg = null;                      //조이스틱 이미지
+    float m_Radius = 0.0f;                                  //조이스틱이 움직일 수 
+    Vector3 m_OrignPos = Vector3.zero;                      //원래 조이스틱이 있던 위치
+    Vector3 m_Axis = Vector3.zero;                          //회전 축
+    Vector3 m_JsCacVec = Vector3.zero;                      //조이스틱 방향 벡터 계산용 변수
+    float m_JsCacDist = 0.0f;                               //조이스틱 방향 계산용 변수
     //Fixed JoyStick 처리부분
 
     //Flexible JoyStick 처리 부분
-    public GameObject m_JoyStickPickPanel = null;
-    private Vector2 posJoyBack;
-    private Vector2 dirStick;
+    public GameObject m_JoyStickPickPanel = null;           //조이스틱 판넬
+    private Vector2 posJoyBack;                             //조이스틱back의 현재 위치 
+    private Vector2 dirStick;                               //조이스틱의 방향
     //Flexible JoyStick 처리 부분
+
     [Header("모바일 UI")]
-    public GameObject mobileUIObj = null;
+    public GameObject mobileUIObj = null;                   //모바일 일 때 나오는 UI오브젝트
     //모바일UI버튼
     public Button m_Attack_Btn = null;                      //공격버튼
     public Button m_Interaction_Btn = null;                 //상호작용 버튼
@@ -49,42 +50,41 @@ public class GameManager : MonoBehaviour
     public Text m_UIText = null;                            //UI판넬의 텍스트
     [HideInInspector] public bool m_isGameOver = false;     //게임오버의 여부
     [HideInInspector] public bool m_isGameClear = false;    //게임을 클리어 했는지의 여부
-    public GameObject m_GOBtnCol = null;    //게임 오버시 나오는 버튼들의 부모 오브젝트
-    public GameObject m_GCBtnCol = null;    //게임 클리어시 나오는 버튼들의 부모 오브젝트
-    public Button m_RetryBtn = null;        //게임 오버시 재시작하는 버튼
-    public Button m_OExitBtn = null;        //게임 오버시 나가는 버튼
-    public Button m_CExitBtn = null;        //게임 클리어시 나가는 버튼
-    public GameObject[] m_KeysImg;          //열쇠의 이미지들
+    public GameObject m_GOBtnCol = null;                    //게임 오버시 나오는 버튼들의 부모 오브젝트
+    public GameObject m_GCBtnCol = null;                    //게임 클리어시 나오는 버튼들의 부모 오브젝트
+    public Button m_RetryBtn = null;                        //게임 오버시 재시작하는 버튼
+    public Button m_OExitBtn = null;                        //게임 오버시 나가는 버튼
+    public Button m_CExitBtn = null;                        //게임 클리어시 나가는 버튼
+    public GameObject[] m_KeysImg;                          //열쇠의 이미지들
 
 
 
     [Header("붉게 점멸하는 UI")]
     //체력이 30퍼센트 이하일때 붉은색 화면이 점멸하는 부분
-    public Image m_BloodScreen = null;  //붉은 화면의 이미지
-    private float m_AniDuring = 0.8f;   //점멸 시간
-    [HideInInspector] public bool m_StartFade = false;   //점멸 조건
-    private float m_CacTime = 0.0f;     //시간 계산용 변수
-    private float m_AddTimer = 0.0f;    //현재 시간에 더해주는 시간
-    private Color m_Color;              //컬러값 변수
-    private readonly float m_StartValue = 1.0f;  //시작 알파값
-    private readonly float m_EndValue = 0.0f;    //끝나는 알파값
+    public Image m_BloodScreen = null;                      //붉은 화면의 이미지
+    private float m_AniDuring = 0.8f;                       //점멸 시간
+    [HideInInspector] public bool m_StartFade = false;      //점멸 조건
+    private float m_CacTime = 0.0f;                         //시간 계산용 변수
+    private float m_AddTimer = 0.0f;                        //현재 시간에 더해주는 시간
+    private Color m_Color;                                  //컬러값 변수
+    private readonly float m_StartValue = 1.0f;             //시작 알파값
+    private readonly float m_EndValue = 0.0f;               //끝나는 알파값
     //체력이 30퍼센트 이하일때 붉은색 화면이 점멸하는 부분
 
-    public bool m_isClearbgm = false;
-    public bool m_isBackbgm = false;
-    public AudioSource m_SoundMgr = null;
+    public bool m_isClearbgm = false;                       //클리어bgm이 나올때 true
+    public bool m_isBackbgm = false;                        //평상시 Bgm이 나올때 true
+    public AudioSource m_SoundMgr = null;                   //오디오소스 할당용 변수
 
     // Start is called before the first frame update
     void Start()
     {
 #if UNITY_ANDROID
-        
-#else
-
-#endif
-        if (mobileUIObj != null)
+            if (mobileUIObj != null)
             mobileUIObj.SetActive(true);
-        SoundManager.Instance.PlayBGM("InGame_BGM",0.1f);
+#endif
+
+
+        SoundManager.Instance.PlayBGM("InGame_BGM", 0.1f);
 
         GameObject a_Player = GameObject.Find("SKELETON");
         if (a_Player != null)
@@ -95,11 +95,11 @@ public class GameManager : MonoBehaviour
         PlayerCtrl.m_playerMaxHp = 50;
 
         GameObject a_SdMgr = GameObject.Find("SoundManager");
-        if(a_SdMgr != null)
+        if (a_SdMgr != null)
         {
             m_SoundMgr = a_SdMgr.GetComponentInChildren<AudioSource>();
         }
-           
+
         GameObject[] a_Enemy = GameObject.FindGameObjectsWithTag("Enemy");
         for (int i = 0; i < m_refEnemy.Length; i++)
         {
@@ -138,7 +138,6 @@ public class GameManager : MonoBehaviour
             entry.callback.AddListener((data) => { OnEngDragJoyStick((PointerEventData)data); });
             trigger.triggers.Add(entry);
             //스크립트로만 대기하고자 할때
-
         }
         #endregion
         //Fixed JoyStick 처리부분
@@ -176,9 +175,9 @@ public class GameManager : MonoBehaviour
             m_JoyStickImg.raycastTarget = false;
 
             EventTrigger trigger = m_JoyStickPickPanel.GetComponent<EventTrigger>();    //인스펙터에서 이벤트트리거가 있어야한다
-
             EventTrigger.Entry entry = new EventTrigger.Entry();
             entry.eventID = EventTriggerType.PointerDown;
+
             entry.callback.AddListener((data) =>
             {
                 OnPointerDown_Flx((PointerEventData)data);
@@ -200,7 +199,6 @@ public class GameManager : MonoBehaviour
                 OnDragJoyStick_Flx((PointerEventData)data);
             });
             trigger.triggers.Add(entry);
-
         }
         #endregion
         //Flexible JoyStick 처리부분
@@ -264,7 +262,7 @@ public class GameManager : MonoBehaviour
         GameUI();
         BloodScreen();
         ShowKeyImg();
-        BGMChange();  
+        BGMChange();
     }
 
     //Fixed JoyStick 처리 부분
@@ -403,7 +401,7 @@ public class GameManager : MonoBehaviour
 
     void GameUI()   //승리 또는 사망시 출력되는 UI
     {
-        Color a_PanelColor = m_UIPanel.color; 
+        Color a_PanelColor = m_UIPanel.color;
 
         if (m_isGameOver)
         {
@@ -418,12 +416,12 @@ public class GameManager : MonoBehaviour
             m_UIPanel.color = a_PanelColor;
         }
         else if (m_isGameClear)
-        {           
+        {
             if (m_isClearbgm)//Clear시의 BGM 재생
-            {       
+            {
                 SoundManager.Instance.PlayBGM("Clear_BGM", 0.1f);
             }
-                
+
             m_SystemPanel.SetActive(true);
 
             m_UIText.text = "Game Clear!!!";
@@ -507,16 +505,15 @@ public class GameManager : MonoBehaviour
             }
 
             if (m_refEnemy[i].m_isbattle == false)//단 하나의 적도 전투 중이 아니라면
-            {              
+            {
                 if (m_refHero.m_playerHp < PlayerCtrl.m_playerMaxHp)
-                {         
+                {
                     m_refHero.m_playerHp += 1.0f * Time.deltaTime;//체력을 회복함
 
                     if (m_refHero.m_playerHp >= PlayerCtrl.m_playerMaxHp)
                     {
                         m_refHero.m_playerHp = PlayerCtrl.m_playerMaxHp;
                     }
-
                     m_refHero.m_playerHpbar.value = m_refHero.m_playerHp / PlayerCtrl.m_playerMaxHp;
                 }//if (m_refHero.m_playerHp < m_refHero.m_playerMaxHp)
             }//if (m_refEnemy[i].m_isbattle == false)                
@@ -551,7 +548,7 @@ public class GameManager : MonoBehaviour
                 if (m_refEnemy[j].m_isbattle)//적중에 하나라도 전투중이라면
                 {
                     m_isBackbgm = true;
-                }                     
+                }
             }//for (int j = 0; j < m_refEnemy.Length; j++)
             if (!m_refEnemy[i].m_isbattle && m_SoundMgr.clip.name == "Battle_BGM" && !m_isBackbgm)
             {
@@ -565,5 +562,4 @@ public class GameManager : MonoBehaviour
             }//if (m_refEnemy[i].m_isbattle && m_SoundMgr.clip.name == "InGame_BGM" && !m_isBackbgm)   
         }//for (int i = 0; i < m_refEnemy.Length; i++)      
     }
-
 }
