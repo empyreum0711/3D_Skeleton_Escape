@@ -168,8 +168,7 @@ public class EnemyCtrl : MonoBehaviour
             m_CurEHp = 0.0f;
 
         if (m_CurEHp <= 0)
-        {
-            
+        {          
             m_EnemyState = AnimState.die;
             MySetAnim(anim.Die.name, 0.13f);
         }
@@ -209,11 +208,11 @@ public class EnemyCtrl : MonoBehaviour
                 if (a_CacDist <= attackDist && m_isHit == true) //플레이어가 공격사거리 안으로 들어왔는지 체크
                 {
                     m_EnemyState = AnimState.attack;    //Enemy의 상태를 attack으로 설정        
-                }//if (a_CacDist <= attackDist) //플레이어가 공격사거리 안으로 들어왔는지 체크
+                }
                 else if (a_CacDist <= traceDist)    //추적범위 이내로 들어왔는지 체크
                 {
                     m_EnemyState = AnimState.trace;     //Enemy의 상태를 trace으로 설정                                                    
-                }//else if (a_CacDist <= traceDist)    //추적범위 이내로 들어왔는지 체크
+                }
                 else
                 {
                     m_EnemyState = AnimState.idle;      //Enemy의 상태를 idle로 설정
@@ -485,7 +484,7 @@ public class EnemyCtrl : MonoBehaviour
         return a_isSucessed;
     }//public bool MoveToPath(float overSpeed = 1.0f)
 
-    //도착 후 경로 삭제하는 함수
+    //도착 후 경로를 삭제하는 함수
     void ClearPath()
     {
         m_PathEndPos = transform.position;

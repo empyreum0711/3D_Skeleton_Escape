@@ -8,7 +8,7 @@ public class G_Singleton<T> : MonoBehaviour where T : G_Singleton<T>    //SceneÏ
 {
     private static T m_Instance = null;
     private static object _syncobj = new object();
-    private static bool appIsClosing = false;
+    private static bool appIsClosing = false; 
 
     public static T Instance
     {
@@ -113,7 +113,6 @@ public class A_Singleton<T> : MonoBehaviour where T : A_Singleton<T> //SceneÏù¥ 
                         m_Instance.Init();
                     }
                 }
-
                 return m_Instance;
             }//lock (_syncobj)
         } // get
