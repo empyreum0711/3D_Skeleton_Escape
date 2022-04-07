@@ -226,7 +226,7 @@ public class GameManager : MonoBehaviour
         if (m_RetryBtn != null)
             m_RetryBtn.onClick.AddListener(() =>
             {
-                SceneManager.LoadScene("02.InGame");
+                SceneManager.LoadScene("02.LoadingScene");
             });
 
         if (m_OExitBtn != null)

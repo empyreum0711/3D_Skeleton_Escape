@@ -59,7 +59,7 @@ public class TitleManager : MonoBehaviour
     //게임씬으로 이동
     void StartBtn()
     {
-        SceneManager.LoadScene("02.InGame");//인게임 씬으로 이동
+        LoadingManager.LoadScene("03.InGame");//로딩 씬으로 이동
     }
 
     //설명 패널 열기
