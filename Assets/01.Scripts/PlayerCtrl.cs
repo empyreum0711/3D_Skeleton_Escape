@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 
 public class PlayerCtrl : MonoBehaviour
 {
@@ -18,12 +19,13 @@ public class PlayerCtrl : MonoBehaviour
     #endregion
 
     #region//공격시 방향 전환용 변수
+    [SerializeField]
     GameObject[] m_EnemyList = null;        //적의 위치를 알기위한 변수
-    float m_AttackDist = 1.9f;              //공격 사거리
+    float m_AttackDist = 7.6f;              //공격 사거리
     Vector3 a_CacTgVec = Vector3.zero;      //타겟과의 거리 계산용 변수
-    //공격시 방향 전환용 변수                                  
+                                            //공격시 방향 전환용 변수                                  
     #endregion
-    
+
     #region//데미지 계산용 변수
     float a_fCacLen = 0.0f;         //적과의 거리 계산용 변수
     int iCount = 0;                 //적이 얼마나 있는지
@@ -32,9 +34,9 @@ public class PlayerCtrl : MonoBehaviour
 
     #region//키보드 입력값 변수
     float h = 0, v = 0;             //각각Horizontal입력과 Vertical입력을 받는 변수
-    Vector3 a_MoveNextStep;         //보폭계산을 위한 변수
+    Vector3 m_MoveNextStep;         //보폭계산을 위한 변수
     Vector3 a_MoveVStep;            //Vertical움직임 계산 변수
-    float m_MoveVelocity = 5.0f;       //평면 초당 이동속도
+    float m_MoveVelocity = 20.0f;       //평면 초당 이동속도
     float a_CalcRotY = 0.0f;           //y축 회전 계산용 변수
     float rotSpeed = 150.0f; //초당 150도 회전하라는 속도
     protected float m_RotSpeed = 3.0f;          //초당 회전 속도
@@ -66,7 +68,13 @@ public class PlayerCtrl : MonoBehaviour
     public GameObject[] m_Keys;             //유저가 획득한 열쇠를 보기위한 변수
     #endregion
 
+    protected NavMeshAgent nvAgent;         //네브메쉬에이전트 할당용 변수
+    private Vector3 m_MoveDir = Vector3.zero;   //평면 진행 방향
 
+    private void Awake()
+    {
+        Camera.main.GetComponent<CameraCtrl>().InitCamera(this.gameObject);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -77,6 +85,8 @@ public class PlayerCtrl : MonoBehaviour
         m_Potionlayer = LayerMask.GetMask("Potion_Health");
         GameObject[] door = GameObject.FindGameObjectsWithTag("Door");
 
+        nvAgent = this.gameObject.GetComponent<NavMeshAgent>();
+
         for (int i = 0; i < door.Length; i++)
         {
             if (door[i] != null)
@@ -84,7 +94,7 @@ public class PlayerCtrl : MonoBehaviour
                 m_doorCtrl = door[i].GetComponent<DoorCtrl>();
             }
         }
-           
+
         GameObject gm = GameObject.Find("GameManager");
         if (gm != null)
         {
@@ -109,12 +119,12 @@ public class PlayerCtrl : MonoBehaviour
             ChangeText();
         }
         else if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Keyslayer))    //Key 레이어에 레이가 맞았다면
-        {          
+        {
             ChangeText();
             m_userText.SetActive(true);
         }
         else if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Potionlayer))  //Potion 레이어에 레이가 맞았다면
-        {          
+        {
             ChangeText();
             m_userText.SetActive(true);
         }
@@ -124,7 +134,7 @@ public class PlayerCtrl : MonoBehaviour
         }
 
         //플레이어의 체력이 0보다 작다면
-        if (m_playerHp <= 0)        
+        if (m_playerHp <= 0)
         {
             MySetAnim(AnimState.die);
 
@@ -191,8 +201,8 @@ public class PlayerCtrl : MonoBehaviour
         }
 
         //가감속 없이 이동하는 법
-        h = Input.GetAxis("Horizontal"); //화살표 좌우키를 누르면 -1.0f, 0.0f,1.0f 사이값을 리턴해준다
-        v = Input.GetAxis("Vertical");   //화살표 위아래키를 누르면 -1.0f, 0.0f,1.0f 사이값을 리턴해준다
+        h = Input.GetAxisRaw("Horizontal"); //화살표 좌우키를 누르면 -1.0f, 0.0f,1.0f 사이값을 리턴해준다
+        v = Input.GetAxisRaw("Vertical");   //화살표 위아래키를 누르면 -1.0f, 0.0f,1.0f 사이값을 리턴해준다
         //가감속 없이 이동하는 법
 
         if (v < 0.0f)
@@ -203,17 +213,20 @@ public class PlayerCtrl : MonoBehaviour
             if (ISAttack() == true)
                 return;
 
-            //기본적인 이동
             a_CalcRotY = transform.eulerAngles.y;
             a_CalcRotY += (h * rotSpeed * Time.deltaTime);
             transform.eulerAngles = new Vector3(0.0f, a_CalcRotY, 0.0f);
 
             a_MoveVStep = transform.forward * v;
-            a_MoveNextStep = a_MoveVStep;
-            a_MoveNextStep = a_MoveNextStep.normalized * m_MoveVelocity * Time.deltaTime;
+            m_MoveNextStep = a_MoveVStep;
+            //기본이동
+            //transform.position = transform.position + m_MoveNextStep;
 
-            transform.position = transform.position + a_MoveNextStep;
-            //기본적인 이동
+            //네브메쉬를 활용한 이동
+            m_MoveNextStep = m_MoveNextStep.normalized * m_MoveVelocity;
+            m_MoveNextStep.y = 0.0f;
+            nvAgent.velocity = m_MoveNextStep;
+            //네브메쉬를 활용한 이동
 
             MySetAnim(AnimState.move);
         }
@@ -228,7 +241,7 @@ public class PlayerCtrl : MonoBehaviour
     }
 
     //조이스틱 관련 변수
-    Vector3 a_CacCamVec;    //카메라의 위치
+    Vector3 a_CacCamVec = Vector3.zero;    //카메라의 위치
     Vector3 a_RightDir = Vector3.zero;  //오른쪽방향
     //조이스틱의 움직임과 동기화
     public void SetJoyStickMove(float a_JoyMoveLen, Vector3 a_JoyMoveDir)
@@ -242,7 +255,9 @@ public class PlayerCtrl : MonoBehaviour
             a_CacCamVec.y = 0.0f;
             a_CacCamVec.Normalize();
             m_JoyMvDir = a_CacCamVec * a_JoyMoveDir.y; //위 아래 조작(카메라가 바라보고 있는 기준으로 위, 아래로 얼만큼 이동시킬 것인지?)
+
             a_RightDir = Vector3.Cross(Vector3.up, a_CacCamVec).normalized;
+
             m_JoyMvDir += (a_RightDir * a_JoyMoveDir.x); //좌우 조작(카메라가 바라보고 있는 기준으로 좌, 우로 얼만큼 이동시킬 것인지?)
             m_JoyMvDir.y = 0.0f;
             m_JoyMvDir.Normalize();
@@ -274,14 +289,17 @@ public class PlayerCtrl : MonoBehaviour
             {
                 Quaternion a_TargetRot = Quaternion.LookRotation(m_JoyMvDir);
                 transform.rotation = Quaternion.Slerp(transform.rotation, a_TargetRot,
-                    (Time.deltaTime * m_RotSpeed) / 3);
+                                     Time.deltaTime * m_RotSpeed / 2.0f);
+                Debug.Log("a_TargetRot" + a_TargetRot);
+                Debug.Log("transform.rotation" + transform.rotation);
             }
             //캐릭터 스프링 회전
 
-            a_MoveNextStep = m_JoyMvDir * (m_MoveVelocity * Time.deltaTime);
-            a_MoveNextStep.y = 0.0f;
 
-            transform.position = transform.position + a_MoveNextStep;
+            //네비게이션 메시를 이용한 이동방법
+            m_MoveNextStep = m_JoyMvDir * m_MoveVelocity;
+            m_MoveNextStep.y = 0.0f;
+            nvAgent.velocity = m_MoveNextStep;
 
             MySetAnim(AnimState.move);
         }
@@ -408,10 +426,11 @@ public class PlayerCtrl : MonoBehaviour
                 if (Vector3.Dot(transform.forward, a_CacTgVec.normalized) < 0.15f)
                     continue;
 
-                if (m_AttackDist + 0.1f < a_fCacLen)
+                if (m_AttackDist + 0.4f < a_fCacLen)
                     continue;
 
                 m_EnemyList[i].GetComponent<EnemyCtrl>().TakeDamage(this.gameObject, 10.0f);
+                Debug.Log("공격");
             }//for(int i=0; i<iCount; ++i)
         }//if(Type == AnimState.attack.ToString())       
     }
@@ -459,7 +478,7 @@ public class PlayerCtrl : MonoBehaviour
         else if (hit.collider.transform.GetComponent<DoorCtrl>().IsOpen == false)
         {
             m_userText.GetComponentInChildren<Text>().text = "상호작용 버튼을 누르면 문이 열립니다.";
-        }      
+        }
 #endif
 
 

@@ -20,8 +20,8 @@ public class EnemyCtrl : MonoBehaviour
     Vector3 m_MoveDir = Vector3.zero;               //수평 진행 노멀 방향 벡터
     public Vector3 m_CacVLen = Vector3.zero;        //플레이어를 향하는 벡터
     public float a_CacDist = 0.0f;                  //거리 계산용 변수
-    public float traceDist = 7.0f;                  //추적 거리
-    float attackDist = 1.8f;                        //공격 거리
+    public float traceDist = 28.0f;                 //추적 거리
+    float attackDist = 7.2f;                        //공격 거리
     Quaternion a_TargetRot;                         //회전 계산용 변수
     float m_RotSpeed = 7.0f;                        //초당 회전 속도
     GameObject m_Attacker = null;                   //이 Enemy를 공격한 캐릭터
@@ -31,10 +31,10 @@ public class EnemyCtrl : MonoBehaviour
     LayerMask m_playerlayer;                //BoxCast에 맞은게 플레이어인지 확인하기 위한 레이어
     RaycastHit hit;                         
     Vector3 m_scales;                       //BoxCast의 크기
-    float m_ScaleX = 7.0f;                  //BoxCast의 x축의 길이
-    float m_ScaleY = 3.0f;                  //BoxCast의 y축의 길이
+    float m_ScaleX = 28.0f;                  //BoxCast의 x축의 길이
+    float m_ScaleY = 12.0f;                  //BoxCast의 y축의 길이
     float m_ScaleZ = 0.0f;                  //BoxCast의 z축의 길이
-    float m_maxDistance = 7.0f;             //BoxCast의 최대 길이
+    float m_maxDistance = 28.0f;             //BoxCast의 최대 길이
     public bool m_isHit;                    //BoxCast에 닿았는지 여부
     float m_MoveVelocity = 2.0f;            //평면 초당 이동속도
     bool m_isDamaged = false;        //플레이어에게 공격 당했는지
@@ -200,9 +200,9 @@ public class EnemyCtrl : MonoBehaviour
 
                 //탐색
                 if (2 < movePath.corners.Length)
-                    traceDist = 14.0f;  //추적범위
+                    traceDist = 56.0f;  //추적범위
                 else
-                    traceDist = 7.0f;    //추적범위
+                    traceDist = 28.0f;    //추적범위
                                          //탐색
 
                 if (a_CacDist <= attackDist && m_isHit == true) //플레이어가 공격사거리 안으로 들어왔는지 체크
@@ -242,9 +242,9 @@ public class EnemyCtrl : MonoBehaviour
 
             //탐색
             if (2 < movePath.corners.Length)
-                traceDist = 14.0f;  //추적범위
+                traceDist = 56.0f;  //추적범위
             else
-                traceDist = 7.0f;    //추적범위
+                traceDist = 28.0f;    //추적범위
                                      //탐색
 
             if (0.0f < a_playerHp.m_playerHp)
