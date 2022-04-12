@@ -10,6 +10,8 @@ public class MouseHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     //마우스 커서의 UI 항목에 대한 Hover 여부
     public bool isUIHover = false;
 
+    public bool isUIUse = false;
+
     void Awake()
     {
         MHinstance = this;
@@ -19,6 +21,7 @@ public class MouseHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public void OnPointerEnter(PointerEventData eventData)
     {
         isUIHover = true;
+ 
     }
 
     //UI위에 마우스가 없을 때

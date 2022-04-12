@@ -39,7 +39,7 @@ public class PlayerCtrl : MonoBehaviour
     float m_MoveVelocity = 20.0f;       //평면 초당 이동속도
     float a_CalcRotY = 0.0f;           //y축 회전 계산용 변수
     float rotSpeed = 150.0f; //초당 150도 회전하라는 속도
-    protected float m_RotSpeed = 3.0f;          //초당 회전 속도
+    protected float m_RotSpeed = 2.0f;          //초당 회전 속도
     //키보드 입력값 변수
     #endregion
 
@@ -110,7 +110,7 @@ public class PlayerCtrl : MonoBehaviour
         if (m_isBirth != true || m_gameMgr.m_isGameClear == true)
             return;
 
-        Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 3.0f;
+        Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 5.0f;
         Debug.DrawLine(m_rayPos.position, a_rayEndPos, Color.white);
 
         if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_doorlayer))         //Door 레이어에 레이가 맞았다면
@@ -290,8 +290,6 @@ public class PlayerCtrl : MonoBehaviour
                 Quaternion a_TargetRot = Quaternion.LookRotation(m_JoyMvDir);
                 transform.rotation = Quaternion.Slerp(transform.rotation, a_TargetRot,
                                      Time.deltaTime * m_RotSpeed / 2.0f);
-                Debug.Log("a_TargetRot" + a_TargetRot);
-                Debug.Log("transform.rotation" + transform.rotation);
             }
             //캐릭터 스프링 회전
 
@@ -430,7 +428,6 @@ public class PlayerCtrl : MonoBehaviour
                     continue;
 
                 m_EnemyList[i].GetComponent<EnemyCtrl>().TakeDamage(this.gameObject, 10.0f);
-                Debug.Log("공격");
             }//for(int i=0; i<iCount; ++i)
         }//if(Type == AnimState.attack.ToString())       
     }

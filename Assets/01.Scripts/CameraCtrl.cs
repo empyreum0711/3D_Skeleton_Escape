@@ -75,19 +75,7 @@ public class CameraCtrl : MonoBehaviour
             m_TargetPos.y += 6.4f;
         }
 
-#if UNITY_ANDROID
-        if (Input.GetMouseButton(0))  //마우스 우측버튼을 누르고 있는 동안
-        {
-            m_PosY -= Input.GetAxis("Mouse Y") * ySpeed; //마우스를 위아래로 움직였을 때 값
-            m_PosY = ClampAngle(m_PosY, yMinLimit, yMaxLimit);
-        }
-#endif
-
-        if (Input.GetMouseButton(1))  //마우스 우측버튼을 누르고 있는 동안
-        {
-            m_PosY -= Input.GetAxis("Mouse Y") * ySpeed; //마우스를 위아래로 움직였을 때 값
-            m_PosY = ClampAngle(m_PosY, yMinLimit, yMaxLimit);
-        }
+       
 
         m_PosX = m_Player.transform.localEulerAngles.y;
 
@@ -135,5 +123,11 @@ public class CameraCtrl : MonoBehaviour
         if (angle > 360)
             angle -= 360;
         return Mathf.Clamp(angle, min, max);
+    }
+
+    public void CameraUpDown()
+    {
+        m_PosY -= Input.GetAxis("Mouse Y") * ySpeed; //마우스를 위아래로 움직였을 때 값
+        m_PosY = ClampAngle(m_PosY, yMinLimit, yMaxLimit);
     }
 }

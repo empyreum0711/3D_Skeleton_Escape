@@ -36,7 +36,7 @@ public class EnemyCtrl : MonoBehaviour
     float m_ScaleZ = 0.0f;                  //BoxCast의 z축의 길이
     float m_maxDistance = 28.0f;             //BoxCast의 최대 길이
     public bool m_isHit;                    //BoxCast에 닿았는지 여부
-    float m_MoveVelocity = 2.0f;            //평면 초당 이동속도
+    float m_MoveVelocity = 6.0f;            //평면 초당 이동속도
     bool m_isDamaged = false;        //플레이어에게 공격 당했는지
     //Enemy AI
 

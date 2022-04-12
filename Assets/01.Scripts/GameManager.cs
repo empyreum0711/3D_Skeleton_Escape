@@ -75,14 +75,15 @@ public class GameManager : MonoBehaviour
     public bool m_isBackbgm = false;                        //평상시 Bgm이 나올때 true
     public AudioSource m_SoundMgr = null;                   //오디오소스 할당용 변수
 
+    CameraCtrl m_Cctrl = null;                              //CameraCtrl컴포넌트 할당용 변수
+
     // Start is called before the first frame update
     void Start()
     {
 #if UNITY_ANDROID
-            if (mobileUIObj != null)
+        if (mobileUIObj != null)
             mobileUIObj.SetActive(true);
 #endif
-
 
         SoundManager.Instance.PlayBGM("InGame_BGM", 0.1f);
 
@@ -108,6 +109,9 @@ public class GameManager : MonoBehaviour
                 m_refEnemy[i] = a_Enemy[i].GetComponent<EnemyCtrl>();
             }
         }
+
+        m_Cctrl = Camera.main.GetComponent<CameraCtrl>();
+
 
         //Fixed JoyStick 처리부분
         #region
@@ -248,6 +252,29 @@ public class GameManager : MonoBehaviour
     {
         m_PHpTxt.text = PlayerCtrl.m_playerMaxHp + " / " + (int)m_refHero.m_playerHp;
 
+        MouseHover.MHinstance.isUIUse = false;
+
+        //조이스틱을 통한 이동시 UI를 벗어났을때 화면이 움직이지 않게 하는 부분
+        if(posJoyBack.x != 0.0f || posJoyBack.y != 0.0f)
+        {
+            if(Input.GetMouseButton(0))
+            {
+                MouseHover.MHinstance.isUIUse = true;
+            }        
+        }
+
+#if UNITY_ANDROID
+        //좌클릭을 했을때
+        if (Input.GetMouseButton(0))
+        {     
+            if (MouseHover.MHinstance.isUIUse == false
+                && MouseHover.MHinstance.isUIHover == false)
+            {
+                m_Cctrl.CameraUpDown();
+            }
+        }
+#endif
+#if UNITY_EDITOR
         //좌클릭을 했을때
         if (Input.GetMouseButtonDown(0))
         {
@@ -256,8 +283,15 @@ public class GameManager : MonoBehaviour
                 m_refHero.AttackOrder();
             }
         }
-        //좌클릭을 했을때    
-
+        //우클릭을 했을때    
+        if (Input.GetMouseButton(1))  //마우스 우측버튼을 누르고 있는 동안
+        {
+            if (MouseHover.MHinstance.isUIHover == false)
+            {
+                m_Cctrl.CameraUpDown();
+            }
+        }
+#endif
         //게임 UI 출력하는 함수
         GameUI();
         BloodScreen();
