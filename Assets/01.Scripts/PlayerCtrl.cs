@@ -110,7 +110,7 @@ public class PlayerCtrl : MonoBehaviour
         if (m_isBirth != true || m_gameMgr.m_isGameClear == true)
             return;
 
-        Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 5.0f;
+        Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 9.0f;
         Debug.DrawLine(m_rayPos.position, a_rayEndPos, Color.white);
 
         if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_doorlayer))         //Door 레이어에 레이가 맞았다면
