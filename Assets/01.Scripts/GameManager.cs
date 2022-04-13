@@ -273,8 +273,7 @@ public class GameManager : MonoBehaviour
                 m_Cctrl.CameraUpDown();
             }
         }
-#endif
-#if UNITY_EDITOR
+#else
         //좌클릭을 했을때
         if (Input.GetMouseButtonDown(0))
         {
