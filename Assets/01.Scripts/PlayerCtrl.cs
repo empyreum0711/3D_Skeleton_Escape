@@ -57,6 +57,7 @@ public class PlayerCtrl : MonoBehaviour
     #endregion
 
     #region//오브젝트와의 상호 작용 관련 변수
+    Vector3 m_rayEndPos;                    //ray의 끝지점
     GameManager m_gameMgr;                  //GameManager의 변수를 가져오기 위한 변수
     DoorCtrl m_doorCtrl;                    //DoorCtrl의 변수를 가져오기 위한 변수
     [SerializeField] Transform m_rayPos;    //ray의 시작점
@@ -110,20 +111,20 @@ public class PlayerCtrl : MonoBehaviour
         if (m_isBirth != true || m_gameMgr.m_isGameClear == true)
             return;
 
-        Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 9.0f;
-        Debug.DrawLine(m_rayPos.position, a_rayEndPos, Color.white);
+        m_rayEndPos = m_rayPos.position + transform.forward * 9.0f;
+        Debug.DrawLine(m_rayPos.position, m_rayEndPos, Color.white);
 
-        if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_doorlayer))         //Door 레이어에 레이가 맞았다면
+        if (Physics.Linecast(m_rayPos.position, m_rayEndPos, out hit, m_doorlayer))         //Door 레이어에 레이가 맞았다면
         {
             m_userText.SetActive(true);
             ChangeText();
         }
-        else if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Keyslayer))    //Key 레이어에 레이가 맞았다면
+        else if (Physics.Linecast(m_rayPos.position, m_rayEndPos, out hit, m_Keyslayer))    //Key 레이어에 레이가 맞았다면
         {
             ChangeText();
             m_userText.SetActive(true);
         }
-        else if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Potionlayer))  //Potion 레이어에 레이가 맞았다면
+        else if (Physics.Linecast(m_rayPos.position, m_rayEndPos, out hit, m_Potionlayer))  //Potion 레이어에 레이가 맞았다면
         {
             ChangeText();
             m_userText.SetActive(true);
@@ -361,8 +362,7 @@ public class PlayerCtrl : MonoBehaviour
     //문 열고 닫는 함수
     public void DoorOnOff()
     {
-        Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 3.0f;
-        if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_doorlayer))
+        if (Physics.Linecast(m_rayPos.position, m_rayEndPos, out hit, m_doorlayer))
         {
             if (hit.collider.CompareTag("Door"))
             {
@@ -374,8 +374,7 @@ public class PlayerCtrl : MonoBehaviour
     //열쇠 챙기는 함수
     public void TakeKeys()
     {
-        Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 3.0f;
-        if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Keyslayer))
+        if (Physics.Linecast(m_rayPos.position, m_rayEndPos, out hit, m_Keyslayer))
         {
             if (hit.collider.CompareTag("Keys"))
             {
@@ -387,8 +386,7 @@ public class PlayerCtrl : MonoBehaviour
     //포션 먹는 함수
     public void Potion()
     {
-        Vector3 a_rayEndPos = m_rayPos.position + transform.forward * 3.0f;
-        if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Potionlayer))
+        if (Physics.Linecast(m_rayPos.position, m_rayEndPos, out hit, m_Potionlayer))
         {
             if (hit.collider.CompareTag("Potion_Health"))
             {
@@ -397,7 +395,7 @@ public class PlayerCtrl : MonoBehaviour
                     hit.collider.transform.GetComponent<PotionCtrl>().TakePotion();
                 }//if (m_Keys[2] == null)
             }//if (hit.collider.CompareTag("Potion_Health"))
-        }//if (Physics.Linecast(m_rayPos.position, a_rayEndPos, out hit, m_Potionlayer))
+        }//if (Physics.Linecast(m_rayPos.position, m_rayEndPos, out hit, m_Potionlayer))
     }//public void Potion()
 
     //공격의 끝을 확인하는 이벤트함수
