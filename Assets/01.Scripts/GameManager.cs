@@ -251,27 +251,20 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         m_PHpTxt.text = PlayerCtrl.m_playerMaxHp + " / " + (int)m_refHero.m_playerHp;
-
-        MouseHover.MHinstance.isUIUse = false;
-
-        //조이스틱을 통한 이동시 UI를 벗어났을때 화면이 움직이지 않게 하는 부분
-        if(posJoyBack.x != 0.0f || posJoyBack.y != 0.0f)
-        {
-            if(Input.GetMouseButton(0))
-            {
-                MouseHover.MHinstance.isUIUse = true;
-            }        
-        }
+        
 
 #if UNITY_ANDROID
         //좌클릭을 했을때
         if (Input.GetMouseButton(0))
         {     
-            if (MouseHover.MHinstance.isUIUse == false
-                && MouseHover.MHinstance.isUIHover == false)
+            if (MouseHover.MHinstance.isUIHover == false)
             {
                 m_Cctrl.CameraUpDown();
             }
+        }
+        else
+        {
+            MouseHover.MHinstance.isUIHover = false;
         }
 #else
         //좌클릭을 했을때
@@ -327,7 +320,6 @@ public class GameManager : MonoBehaviour
         //캐릭터 이동
         if (m_refHero != null)
             m_refHero.SetJoyStickMove(m_JsCacDist, m_Axis);
-
     }
 
     void OnEngDragJoyStick(PointerEventData _data)  //Delegate

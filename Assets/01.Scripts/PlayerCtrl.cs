@@ -169,7 +169,7 @@ public class PlayerCtrl : MonoBehaviour
         //시작할때 플레이어를 리스폰시키는 연출
     }
 
-    //플레이어의 셰이더값을 조절해 서서히 나타나게 하는 함수
+    //플레이어의 셰이더값을 조절해 서서히 나타나게 하는 코루틴
     IEnumerator Birth()
     {
         while (m_dissolve > 0f)
@@ -404,7 +404,7 @@ public class PlayerCtrl : MonoBehaviour
         MySetAnim(AnimState.idle);
     }
 
-    //애니메이션 이벤트 호출용 함수
+    //공격 대상이 있는지 확인하고 대상이 있다면 대미지를 입히는 함수
     public void Event_AttDamage(string Type)
     {
         m_EnemyList = GameObject.FindGameObjectsWithTag("Enemy");

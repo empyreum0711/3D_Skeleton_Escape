@@ -205,7 +205,7 @@ public class EnemyCtrl : MonoBehaviour
                     traceDist = 28.0f;    //추적범위
                                          //탐색
 
-                if (a_CacDist <= attackDist && m_isHit == true) //플레이어가 공격사거리 안으로 들어왔는지 체크
+                if (a_CacDist <= attackDist && m_isHit == true) //플레이어가 공격사거리 안으로 들어왔는지 && Ray에 닿았는지(시야에 닿았는지) 체크
                 {
                     m_EnemyState = AnimState.attack;    //Enemy의 상태를 attack으로 설정        
                 }
@@ -249,7 +249,7 @@ public class EnemyCtrl : MonoBehaviour
 
             if (0.0f < a_playerHp.m_playerHp)
             {
-                if (a_CacDist <= attackDist && m_isHit == true)                    //공격 사거리내에 들어왔는지 체크
+                if (a_CacDist <= attackDist && m_isHit == true)                    //공격 사거리내에 들어왔는지 && Ray에 닿았는지(시야에 닿았는지) 체크
                 {
                     m_EnemyState = AnimState.attack;            //Enemy의 상태를 attack으로 설정
                     m_AggroTarget = a_player.gameObject;        //타겟 설정

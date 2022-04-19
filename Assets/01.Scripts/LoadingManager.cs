@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class LoadingManager : MonoBehaviour
 {
     static string m_nextScene;      //넘어갈 씬의 이름
+
     [SerializeField]
     Image m_progressBar;          //로딩바
 
@@ -22,7 +23,7 @@ public class LoadingManager : MonoBehaviour
         StartCoroutine(LoadSceneProcess());
     }
 
-
+    //로딩창을 구현하는 코루틴
     IEnumerator LoadSceneProcess()
     {
         AsyncOperation op = SceneManager.LoadSceneAsync(m_nextScene);
